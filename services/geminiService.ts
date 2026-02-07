@@ -34,8 +34,8 @@ export const analyzeMealImage = async (base64Image: string): Promise<Partial<Mea
 };
 
 export const generateDailyBriefing = async (
-  metrics: HealthMetrics, 
-  meals: MealLog[], 
+  metrics: HealthMetrics,
+  meals: MealLog[],
   persona: string
 ) => {
   const prompt = `As ${persona}, a personal health assistant, provide a daily briefing based on these stats:
@@ -67,18 +67,20 @@ export const generateDailyBriefing = async (
 };
 
 export const findNearbyHealthyOptions = async (lat: number, lng: number) => {
-  // Explicitly using Gemini 3 Flash with Google Search
-  // Google Maps Grounding is restricted to 2.5 series, so we use Search for 3.0
+  // Using gemini-2.5-flash as Maps Grounding is supported on 2.5 series.
   const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
-    contents: `Find the 3 best healthy grocery stores or restaurants near latitude ${lat}, longitude ${lng}. 
-    For each, provide:
-    1. Name
-    2. Why it's healthy
-    3. One recommended item
-    Keep the response concise and formatted as a list.`,
+    model: "gemini-2.5-flash",
+    contents: "Find the best healthy grocery stores and restaurants nearby. List them using bullet points. Use **bold text** for the place names and include a short reason why it's good.",
     config: {
-      tools: [{ googleSearch: {} }]
+      tools: [{ googleMaps: {} }],
+      toolConfig: {
+        retrievalConfig: {
+          latLng: {
+            latitude: lat,
+            longitude: lng
+          }
+        }
+      } as any
     },
   });
 
