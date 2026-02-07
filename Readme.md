@@ -11,6 +11,11 @@ Koda is a **AI-powered personal health assistant** built with **React Native (Ex
 4.  **Waitrose Integration**: Connects to a custom **Cloud Run** microservice to fetch real-time food offers using Browser-Use (https://gemini.browserbase.com/).
 5.  **Adaptive Personas**: Switch between Coach, Scientist, or Friend personas to change the AI's tone.
 
+## Motivation
+
+- Need to get healthier/fitter and not go in the lazy habbit of eating junk food.
+- Personal Goal -> Do the Stairway to Heaven Via Ferrata this June (https://www.dachstein.at/en/summer/via-ferrata-donnerkogel)
+
 ---
 
 ## Architecture
