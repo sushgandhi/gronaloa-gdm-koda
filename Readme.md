@@ -41,7 +41,6 @@ Koda is now optimized for **Expo**, allowing you to run it as a native app on iO
    ```
    API_KEY=your_google_gemini_key_here
    ```
-   *Get your key from [Google AI Studio](https://aistudio.google.com/)*
 
 3. **Run the App**
    ```bash
