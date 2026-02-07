@@ -1,60 +1,138 @@
-## Personal Health Assistant - 
 
-Koda is a personal health assistant which helps users to maintain a healthy lifestyle. 
+# Koda Health Assistant 🌿
 
-### Goals - 
+Koda is a **AI-powered personal health assistant** built with **React Native (Expo)** and **Google Gemini**. It helps users track nutrition, find healthy local spots, and save money on healthy groceries by scraping real-time offers.
 
-We are building a personal health assistant with following goals
+## Key Features
 
+1.  **Daily AI Briefing**: Generates a personalized morning plan based on sleep, activity, and local grocery deals (Waitrose).
+2.  **Smart Food Log**: Uses **Gemini Vision** to analyze meal photos for calories, macros, and healthy alternatives.
+3.  **Local Discovery**: Uses **Gemini Maps Grounding** to find and rank nearby healthy restaurants and stores.
+4.  **Waitrose Scraper Integration**: Connects to a custom **Cloud Run** microservice to fetch real-time food offers.
+5.  **Adaptive Personas**: Switch between Coach, Scientist, or Friend personas to change the AI's tone.
 
-1. Integrate with Apple Health and Google Fit to track health metrics, daily activities, sleep patterns, heart rate, blood pressure, blood glucose levels, etc.
-2. Give the option to user to select a persona, which will be the face of the assistant. 
-3. Give the user the ability to upload meal photos and get the nutritional information of the meal. 
-4. Based everyday's activity, health metrics, meal information, suggest a plan for the user for the next day.
-5. The assistant should suggest "healthier" alternatives for the food items in the meal. 
-6. The assitant should browser local gorcery stores and recepies to suggest a plan for the user.
-7. To browser local grocery stores, we will use browser automation tool browser-use  to browser things like Tesco, Waitrose, Sainsbury's etc. and get the prices of the products and the nutritional information of the products.
-8. there should be a daily breifing in the morning for the user about the plan for the day.
-9. The health assistant should also have an ability to suggest healthier eating out options for the user based on their health metrics and meal information and location. if a user is an area, asks recomendation. health assistant should suggest not just the restaurant but also the specific dishes which are healthier for the user. 
+---
 
+## Architecture
 
+The app follows a **Client-Server-Cloud** architecture:
 
+1.  **Frontend (Expo/React Native)**: Handles UI, device sensors (Camera, Location), and direct calls to Gemini API.
+2.  **AI Layer (Google Gemini)**: 
+    *   `gemini-3-flash-preview`: For reasoning, daily briefings, and image analysis.
+    *   `gemini-2.5-flash`: For Google Maps grounding (Location Search).
+3.  **Backend (Google Cloud Run)**: A Node.js microservice using Puppeteer/Browserbase to scrape Waitrose offers securely 
+4.  **Storage (Hybrid)**: 
+    *   **Local**: Async Storage for offline caching.
+    *   **Cloud**: Firebase Firestore (Configured but currently mocked for dev speed).
 
-# Koda Health Assistant - Expo Setup
+---
 
-Koda is now optimized for **Expo**, allowing you to run it as a native app on iOS/Android or on the Web.
+##  Setup & Installation
 
-## Prerequisites
-- Node.js (v18+)
-- Expo Go app on your phone (for mobile testing)
-- **Google Gemini API Key** (Required for AI features)
+### 1. Prerequisites
+*   Node.js (v18+)
+*   Expo Go app (Android/iOS)
+*   Google Cloud Project (for Gemini & Cloud Run)
 
-## Getting Started
+### 2. Environment Variables
+Create a `.env` file in the root directory:
 
-1. **Install Dependencies**
-   ```bash
-   npm install
-   ```
+```env
+# Google GenAI Key (Required)
+API_KEY=your_gemini_api_key
 
-2. **Configure API Key**
-   Create a `.env` file in the root directory:
-   ```
-   API_KEY=your_google_gemini_key_here
-   ```
+# Backend Service for Scraping (Optional - defaults to mock if empty)
+CLOUD_RUN_URL=https://your-koda-service-url.run.app
 
-3. **Run the App**
-   ```bash
-   # Start Expo development server
-   npx expo start
-   ```
-   *Note: If you change the .env file, restart the server with `npx expo start --clear`.*
+# Firebase (Optional - currently using Mock User)
+FIREBASE_API_KEY=...
+FIREBASE_AUTH_DOMAIN=...
+FIREBASE_PROJECT_ID=...
+```
 
-4. **Testing**
-   - **Android**: Press `a` or scan the QR code in Expo Go.
-   - **iOS**: Press `i` or scan the QR code in Expo Go.
-   - **Web**: Press `w` to open in your browser.
+### 3. Run the App
+```bash
+# Install dependencies
+npm install
 
-## Native Features Used
-- **expo-image-picker**: For native camera and gallery access to log meals.
-- **expo-location**: For precise nearby search using GPS.
-- **react-native**: High-performance UI components.
+# Start the development server
+npx expo start
+```
+
+---
+
+## API Documentation
+
+### 1. Cloud Run Service (Web Scraper)
+**Purpose:** Fetches current offers from Waitrose to inform the AI Briefing.
+
+*   **Endpoint:** `GET /offers`
+*   **Host:** Your Cloud Run URL (e.g., `https://koda-service.run.app`)
+*   **Headers:** None (Publicly accessible for this demo, or add Bearer token)
+*   **Response:**
+    ```json
+    {
+      "success": true,
+      "data": "Waitrose Duchy Organic Salmon Fillets - Save 25%..."
+    }
+    ```
+*   **Client Handling:** 
+    *   Located in `services/browserService.ts`.
+    *   Includes an **AbortController** to timeout requests > 8 seconds (handling Cloud Run cold starts).
+    *   Falls back to mock data if the server is unreachable.
+
+### 2. Authentication (Firebase)
+**Status:** *Currently mocked for development ease.*
+
+*   **Implementation:** `config/firebase.ts` & `screens/Profile.tsx`
+*   **Flow:**
+    1.  User clicks "Sign in with Google".
+    2.  `GoogleSignin.signIn()` returns an ID token.
+    3.  `firebase.auth.GoogleAuthProvider.credential(token)` signs into Firebase.
+    4.  User profile is stored in `AsyncStorage` and Context.
+*   **Mock User:** Currently hardcoded as "Sushant Gandhi" in `services/healthData.ts` to allow testing all features without login friction.
+
+### 3. Gemini AI Interactions
+
+#### A. Meal Analysis (Vision)
+*   **Model:** `gemini-3-flash-preview`
+*   **Input:** Base64 Image string.
+*   **Prompt:** "Analyze this meal photo... Respond in JSON."
+*   **Schema:** Returns `calories`, `protein`, `fats`, `carbs`, and `alternatives`.
+
+#### B. Daily Briefing (Reasoning)
+*   **Model:** `gemini-3-flash-preview`
+*   **Input:** User Metrics (Steps, Sleep) + Scraped Waitrose Text.
+*   **Output:** JSON containing summary, tomorrow's plan, and a recipe based on the scraped deals.
+
+#### C. Local Search (Grounding)
+*   **Model:** `gemini-2.5-flash`
+*   **Tool:** `googleMaps`
+*   **Config:**
+    ```ts
+    tools: [{ googleMaps: {} }],
+    toolConfig: { retrievalConfig: { latLng: { latitude: ..., longitude: ... } } }
+    ```
+*   **Output:** Returns text with grounding metadata (source links to Google Maps).
+
+---
+
+## Project Structure
+
+```
+├── App.tsx                 # Entry point & Navigation
+├── app.json                # Expo Configuration
+├── components/             # Reusable UI components
+├── config/                 # Firebase & Env config
+├── screens/
+│   ├── Home.tsx            # Dashboard & Daily Briefing
+│   ├── Log.tsx             # Camera & Gemini Vision Analysis
+│   ├── Discover.tsx        # Maps Grounding & Local Search
+│   └── Profile.tsx         # Persona settings & Auth UI
+├── services/
+│   ├── browserService.ts   # Cloud Run / Waitrose Scraper
+│   ├── geminiService.ts    # All AI interactions
+│   └── healthData.ts       # Data persistence (Local/Cloud)
+└── types.ts                # TypeScript interfaces
+```
