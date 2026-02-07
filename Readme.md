@@ -6,10 +6,11 @@ Koda is a **AI-powered personal health assistant** built with **React Native (Ex
 ## Key Features
 
 1.  **Daily AI Briefing**: Generates a personalized morning plan based on sleep, activity, and local grocery deals (Waitrose).
-2.  **Smart Food Log**: Uses **Gemini Vision** to analyze meal photos for calories, macros, and healthy alternatives.
-3.  **Local Discovery**: Uses **Gemini Maps Grounding** to find and rank nearby healthy restaurants and stores.
-4.  **Waitrose Integration**: Connects to a custom **Cloud Run** microservice to fetch real-time food offers using Browser-Use (https://gemini.browserbase.com/).
-5.  **Adaptive Personas**: Switch between Coach, Scientist, or Friend personas to change the AI's tone.
+2.  **Integratio**: Integrates with Google Health Connect(Android)
+3.  **Smart Food Log**: Uses **Gemini Vision** to analyze meal photos for calories, macros, and healthy alternatives.
+4.  **Local Discovery**: Uses **Gemini Maps Grounding** to find and rank nearby healthy restaurants and stores.
+5.  **Waitrose Integration**: Connects to a custom **Cloud Run** microservice to fetch real-time food offers using Browser-Use (https://gemini.browserbase.com/).
+6.  **Adaptive Personas**: Switch between Coach, Scientist, or Friend personas to change the AI's tone.
 
 ## Motivation
 
