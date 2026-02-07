@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "48391334043",
+    "project_id": "koda-8abd2",
+    "storage_bucket": "koda-8abd2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:48391334043:android:798b7eabb87705373bbe3e",
+        "android_client_info": {
+          "package_name": "com.koda.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "<key>"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
