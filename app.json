@@ -28,7 +28,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.koda.health",
+      "package": "com.koda.app",
       "permissions": [
         "CAMERA",
         "ACCESS_COARSE_LOCATION",
@@ -37,6 +37,20 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you log meals."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Koda to use your location."
+        }
+      ]
+    ]
   }
 }

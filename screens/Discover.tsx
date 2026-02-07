@@ -8,7 +8,7 @@ const Discover: React.FC = () => {
   const [results, setResults] = useState<string | null>(null);
   const [sources, setSources] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [location, setLocation] = useState<{ lat: number, lng: number } | null>(null);
+  const [location, setLocation] = useState<{lat: number, lng: number} | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -54,7 +54,7 @@ const Discover: React.FC = () => {
           </View>
         );
       }
-
+      
       // Handle Headings (simple check)
       if (line.trim().startsWith('#')) {
         const cleanLine = line.replace(/^#+\s*/, '');
@@ -67,7 +67,7 @@ const Discover: React.FC = () => {
 
       // Regular Paragraphs (ignore empty lines for spacing)
       if (line.trim().length === 0) {
-        return <View key={index} style={{ height: 8 }} />;
+         return <View key={index} style={{ height: 8 }} />;
       }
 
       return (
@@ -99,9 +99,9 @@ const Discover: React.FC = () => {
           <Text style={styles.heroTitle}>Browse Stores & Eats</Text>
           <Text style={styles.heroDesc}>Koda will check nearby grocery stores and restaurants for healthier options.</Text>
           <View style={styles.buttonRow}>
-            <TouchableOpacity
-              style={styles.heroButton}
-              onPress={handleSearch}
+            <TouchableOpacity 
+              style={styles.heroButton} 
+              onPress={handleSearch} 
               disabled={loading}
             >
               {loading ? (
@@ -110,7 +110,7 @@ const Discover: React.FC = () => {
                 <Text style={styles.heroButtonText}>Scan My Area</Text>
               )}
             </TouchableOpacity>
-
+            
             {!loading && location && (
               <TouchableOpacity style={styles.mapButton} onPress={openInMaps}>
                 <Text style={styles.mapButtonText}>Open Maps 🗺️</Text>
@@ -126,7 +126,7 @@ const Discover: React.FC = () => {
           <View style={styles.markdownContainer}>
             {renderMarkdown(results)}
           </View>
-
+          
           {sources.length > 0 && (
             <View style={styles.sourcesSection}>
               <Text style={styles.sourcesLabel}>Locations Found</Text>
@@ -137,13 +137,13 @@ const Discover: React.FC = () => {
 
                   if (mapSource) {
                     return (
-                      <TouchableOpacity
-                        key={index}
+                      <TouchableOpacity 
+                        key={index} 
                         onPress={() => Linking.openURL(mapSource.uri)}
                         style={styles.placeCard}
                       >
                         <View style={styles.placeIcon}>
-                          <Text style={{ fontSize: 20 }}>📍</Text>
+                           <Text style={{fontSize: 20}}>📍</Text>
                         </View>
                         <View style={styles.placeInfo}>
                           <Text style={styles.placeName}>{mapSource.title}</Text>
@@ -153,16 +153,16 @@ const Discover: React.FC = () => {
                       </TouchableOpacity>
                     );
                   }
-
+                  
                   if (webSource) {
                     return (
-                      <TouchableOpacity
-                        key={index}
+                      <TouchableOpacity 
+                        key={index} 
                         onPress={() => Linking.openURL(webSource.uri)}
                         style={styles.placeCard}
                       >
-                        <View style={styles.placeIcon}>
-                          <Text style={{ fontSize: 20 }}>🌐</Text>
+                         <View style={styles.placeIcon}>
+                           <Text style={{fontSize: 20}}>🌐</Text>
                         </View>
                         <View style={styles.placeInfo}>
                           <Text style={styles.placeName}>{webSource.title}</Text>
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
   mapButtonText: { color: 'white', fontWeight: '700' },
   blob: { position: 'absolute', top: -40, right: -40, width: 120, height: 120, backgroundColor: 'rgba(16, 185, 129, 0.2)', borderRadius: 60 },
   resultsCard: { marginTop: 24, backgroundColor: 'white', padding: 24, borderRadius: 24, borderWidth: 1, borderColor: '#F1F5F9' },
-
+  
   // Markdown Styles
   markdownContainer: { gap: 4 },
   mdParagraph: { fontSize: 15, color: '#334155', lineHeight: 24 },

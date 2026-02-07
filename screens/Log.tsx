@@ -1,13 +1,23 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { analyzeMealImage } from '../services/geminiService';
+import { saveMealLog, getMealLogs } from '../services/healthData';
 import { MealLog } from '../types';
 
 const Log: React.FC = () => {
   const [meals, setMeals] = useState<MealLog[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
+
+  useEffect(() => {
+    loadMeals();
+  }, []);
+
+  const loadMeals = async () => {
+    const data = await getMealLogs();
+    setMeals(data);
+  };
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -54,6 +64,9 @@ const Log: React.FC = () => {
         fats: analysis.fats || 0,
         alternatives: analysis.alternatives || []
       };
+      
+      // Save locally and to cloud
+      await saveMealLog(newMeal);
       setMeals([newMeal, ...meals]);
     } catch (e) {
       console.error(e);

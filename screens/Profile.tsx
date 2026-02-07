@@ -1,13 +1,23 @@
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, Alert, Platform } from 'react-native';
 import { Persona } from '../types';
 import { saveUserPersona, getUserPersona } from '../services/healthData';
+// import { auth, firebase } from '../config/firebase'; // Disabled for now
 
 const Profile: React.FC = () => {
   const [selectedPersona, setSelectedPersona] = useState<string>('Coach Kai');
+  
+  // Hardcoded User
+  const [user, setUser] = useState({
+    displayName: 'Sushant Gandhi',
+    email: 'sushant@example.com',
+    photoURL: null,
+    uid: 'mock-user-sushant'
+  });
 
   useEffect(() => {
+    // 2. Load Persona
     const load = async () => {
       const p = await getUserPersona();
       setSelectedPersona(p);
@@ -18,6 +28,11 @@ const Profile: React.FC = () => {
   const handlePersonaChange = async (p: Persona) => {
     setSelectedPersona(p);
     await saveUserPersona(p);
+  };
+
+  const handleLogin = async () => {
+    console.log("Login disabled during dev");
+    Alert.alert("Coming Soon", "Google Sign-In is temporarily disabled for development.");
   };
 
   const personas = [
@@ -31,12 +46,25 @@ const Profile: React.FC = () => {
       <View style={styles.header}>
         <View style={styles.avatarContainer}>
           <Image 
-            source={{ uri: `https://picsum.photos/seed/${selectedPersona}/200` }} 
+            source={{ uri: user?.photoURL || `https://picsum.photos/seed/${selectedPersona}/200` }} 
             style={styles.avatar}
           />
         </View>
-        <Text style={styles.personaName}>{selectedPersona}</Text>
-        <Text style={styles.personaRole}>Your Virtual Health Assistant</Text>
+        
+        {user ? (
+          <>
+             <Text style={styles.personaName}>{user.displayName}</Text>
+             <Text style={styles.personaRole}>{user.email}</Text>
+          </>
+        ) : (
+          <>
+            <Text style={styles.personaName}>Guest</Text>
+            <TouchableOpacity onPress={handleLogin} style={styles.googleBtn}>
+              <Text style={styles.googleBtnIcon}>G</Text>
+              <Text style={styles.googleBtnText}>Sign in with Google</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
 
       <Text style={styles.sectionTitle}>Choose Assistant Persona</Text>
@@ -85,10 +113,15 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   scrollContent: { padding: 24 },
   header: { alignItems: 'center', marginBottom: 32 },
-  avatarContainer: { width: 100, height: 100, borderRadius: 50, borderWidth: 4, borderColor: 'white', elevation: 10, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, overflow: 'hidden' },
+  avatarContainer: { width: 100, height: 100, borderRadius: 50, borderWidth: 4, borderColor: 'white', elevation: 10, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, overflow: 'hidden', backgroundColor: '#EEE' },
   avatar: { width: '100%', height: '100%' },
   personaName: { fontSize: 24, fontWeight: '800', marginTop: 16, color: '#1E293B' },
-  personaRole: { fontSize: 14, color: '#64748B' },
+  personaRole: { fontSize: 14, color: '#64748B', marginBottom: 12 },
+  
+  googleBtn: { marginTop: 12, flexDirection: 'row', alignItems: 'center', backgroundColor: '#4285F4', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 24, gap: 12 },
+  googleBtnText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
+  googleBtnIcon: { color: 'white', fontWeight: '900', fontSize: 18 },
+  
   sectionTitle: { fontSize: 16, fontWeight: '800', color: '#1E293B', marginBottom: 16 },
   personaGrid: { gap: 12, marginBottom: 32 },
   personaCard: { flexDirection: 'row', alignItems: 'center', padding: 16, backgroundColor: 'white', borderRadius: 24, borderWidth: 1, borderColor: '#F1F5F9', gap: 16 },

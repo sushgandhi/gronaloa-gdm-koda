@@ -1,37 +1,71 @@
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet, Image, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Image, ActivityIndicator, TouchableOpacity, Linking } from 'react-native';
 import { HealthMetrics, DailyBriefing } from '../types';
-import { getSimulatedHealthData, getUserPersona } from '../services/healthData';
+import { getHealthMetrics, getUserPersona, getStoredBriefing, saveBriefing, getMealLogs } from '../services/healthData';
 import { generateDailyBriefing } from '../services/geminiService';
+import { getWaitroseOffers } from '../services/browserService';
+// import { auth } from '../config/firebase'; // Disabled for now
 
 const Home: React.FC = () => {
   const [metrics, setMetrics] = useState<HealthMetrics | null>(null);
   const [briefing, setBriefing] = useState<DailyBriefing | null>(null);
   const [loading, setLoading] = useState(false);
   const [persona, setPersona] = useState<string>('Coach Kai');
+  
+  // Hardcoded User
+  const [user, setUser] = useState({
+    displayName: 'Sushant Gandhi',
+    email: 'sushant@example.com',
+    photoURL: null,
+    uid: 'mock-user-sushant'
+  });
+
+  // Listen to Auth State - DISABLED
+  /*
+  useEffect(() => {
+    if (!auth) return;
+    const unsubscribe = auth.onAuthStateChanged(u => {
+      setUser(u);
+      refreshData();
+    });
+    return () => unsubscribe();
+  }, []);
+  */
+
+  const refreshData = async () => {
+    // 1. Load Persona
+    const p = await getUserPersona();
+    setPersona(p);
+
+    // 2. Load Health Data (Cloud or Local)
+    const data = await getHealthMetrics();
+    setMetrics(data);
+
+    // 3. Check for existing briefing
+    const existingBriefing = await getStoredBriefing();
+    if (existingBriefing) {
+      setBriefing(existingBriefing);
+    } else {
+      // 4. Generate if missing
+      fetchNewBriefing(data, p);
+    }
+  };
 
   useEffect(() => {
-    const init = async () => {
-      // 1. Load Persona
-      const p = await getUserPersona();
-      setPersona(p);
-
-      // 2. Load Health Data
-      const data = getSimulatedHealthData();
-      setMetrics(data);
-
-      // 3. Fetch Briefing using the loaded persona
-      fetchBriefing(data, p);
-    };
-    init();
+    refreshData();
   }, []);
 
-  const fetchBriefing = async (data: HealthMetrics, activePersona: string) => {
+  const fetchNewBriefing = async (data: HealthMetrics, activePersona: string) => {
     setLoading(true);
     try {
-      const b = await generateDailyBriefing(data, [], activePersona);
+      const meals = await getMealLogs();
+      // Fetch offers via Browserbase integration (simulated in service)
+      const offers = await getWaitroseOffers();
+      
+      const b = await generateDailyBriefing(data, meals, activePersona, offers);
       setBriefing(b);
+      await saveBriefing(b); // Save to Firestore/Local
     } catch (error) {
       console.error(error);
     } finally {
@@ -46,10 +80,12 @@ const Home: React.FC = () => {
       <View style={styles.header}>
         <View>
           <Text style={styles.title}>Koda</Text>
-          <Text style={styles.subtitle}>Welcome back, Health Seeker</Text>
+          <Text style={styles.subtitle}>
+            {user ? `Welcome, ${user.displayName}` : 'Welcome back, Health Seeker'}
+          </Text>
         </View>
         <Image 
-          source={{ uri: `https://picsum.photos/seed/${persona}/100` }} 
+          source={{ uri: user?.photoURL || `https://picsum.photos/seed/${persona}/100` }} 
           style={styles.avatar}
         />
       </View>
@@ -63,10 +99,40 @@ const Home: React.FC = () => {
         </View>
         
         {loading ? (
-          <ActivityIndicator color="white" style={styles.loader} />
+          <View style={styles.loaderContainer}>
+             <ActivityIndicator color="white" size="large" />
+             <Text style={styles.loaderText}>Generating Daily Briefing...</Text>
+          </View>
         ) : briefing ? (
           <View style={styles.briefingBody}>
             <Text style={styles.summaryText}>{briefing.summary}</Text>
+            
+            {/* Smart Shopping Card */}
+            {briefing.shoppingSuggestion && (
+              <View style={styles.shoppingCard}>
+                <View style={styles.shoppingHeader}>
+                    <Text style={styles.shoppingIcon}>🛒</Text>
+                    <View>
+                        <Text style={styles.shoppingTitle}>Smart Deal Meal</Text>
+                        <Text style={styles.shoppingSubtitle}>Sourced from {briefing.shoppingSuggestion.store}</Text>
+                    </View>
+                </View>
+                <Text style={styles.recipeName}>{briefing.shoppingSuggestion.recipeName}</Text>
+                <Text style={styles.savingsNote}>{briefing.shoppingSuggestion.savingsNote} ({briefing.shoppingSuggestion.itemOnSale})</Text>
+                <View style={styles.ingredientList}>
+                    {briefing.shoppingSuggestion.ingredients.map((ing, i) => (
+                        <Text key={i} style={styles.ingredient}>• {ing}</Text>
+                    ))}
+                </View>
+                <TouchableOpacity 
+                    onPress={() => Linking.openURL('https://www.waitrose.com/ecom/shop/offers/94931')}
+                    style={styles.shopBtn}
+                >
+                    <Text style={styles.shopBtnText}>Shop Deal</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
             <Text style={styles.planHeader}>TOMORROW'S PLAN</Text>
             {briefing.plan.map((item, idx) => (
               <View key={idx} style={styles.planItem}>
@@ -76,8 +142,8 @@ const Home: React.FC = () => {
             ))}
           </View>
         ) : (
-          <TouchableOpacity onPress={() => fetchBriefing(metrics, persona)} style={styles.retryButton}>
-             <Text style={styles.retryText}>Refresh Briefing</Text>
+          <TouchableOpacity onPress={() => fetchNewBriefing(metrics, persona)} style={styles.retryButton}>
+             <Text style={styles.retryText}>Generate Briefing</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -118,8 +184,23 @@ const styles = StyleSheet.create({
   tag: { backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
   tagText: { color: 'white', fontSize: 10, fontWeight: '800' },
   personaText: { color: '#D1FAE5', fontSize: 10 },
-  loader: { padding: 20 },
-  summaryText: { color: 'white', fontSize: 18, fontWeight: '600', lineHeight: 24, marginBottom: 16 },
+  loaderContainer: { padding: 20, alignItems: 'center' },
+  loaderText: { color: 'white', marginTop: 10, fontSize: 14 },
+  summaryText: { color: 'white', fontSize: 18, fontWeight: '600', lineHeight: 24, marginBottom: 20 },
+  
+  // Shopping Card Styles
+  shoppingCard: { backgroundColor: '#F0FDF4', borderRadius: 20, padding: 16, marginBottom: 24 },
+  shoppingHeader: { flexDirection: 'row', gap: 12, marginBottom: 12 },
+  shoppingIcon: { fontSize: 24 },
+  shoppingTitle: { fontSize: 16, fontWeight: '800', color: '#166534' },
+  shoppingSubtitle: { fontSize: 12, color: '#15803D' },
+  recipeName: { fontSize: 18, fontWeight: 'bold', color: '#14532D', marginBottom: 4 },
+  savingsNote: { fontSize: 12, fontStyle: 'italic', color: '#15803D', marginBottom: 12 },
+  ingredientList: { marginBottom: 16 },
+  ingredient: { fontSize: 13, color: '#166534', marginBottom: 2 },
+  shopBtn: { backgroundColor: '#166534', paddingVertical: 10, borderRadius: 12, alignItems: 'center' },
+  shopBtnText: { color: 'white', fontWeight: 'bold', fontSize: 12 },
+
   planHeader: { color: '#D1FAE5', fontSize: 12, fontWeight: '900', marginBottom: 8 },
   planItem: { flexDirection: 'row', gap: 10, backgroundColor: 'rgba(255,255,255,0.1)', padding: 12, borderRadius: 16, marginBottom: 8 },
   planBullet: { color: '#A7F3D0' },

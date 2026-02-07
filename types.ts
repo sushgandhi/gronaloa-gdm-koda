@@ -26,10 +26,19 @@ export interface MealLog {
   alternatives: string[];
 }
 
+export interface ShoppingSuggestion {
+  store: string;
+  itemOnSale: string;
+  recipeName: string;
+  ingredients: string[];
+  savingsNote: string;
+}
+
 export interface DailyBriefing {
   summary: string;
   plan: string[];
   tips: string[];
+  shoppingSuggestion?: ShoppingSuggestion;
 }
 
 export interface NearbySuggestion {
