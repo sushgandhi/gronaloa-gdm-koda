@@ -25,6 +25,8 @@ The app follows a **Client-Server-Cloud** architecture:
 4.  **Storage (Hybrid)**: 
     *   **Local**: Async Storage for offline caching.
     *   **Cloud**: Firebase Firestore (Configured but can use mocked user for dev speed).
+  
+![Architecture](Architecture.png "Architecture")
 
 ---
 
