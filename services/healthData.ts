@@ -1,4 +1,5 @@
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { HealthMetrics } from '../types';
 
 export const getSimulatedHealthData = (): HealthMetrics => {
@@ -12,5 +13,19 @@ export const getSimulatedHealthData = (): HealthMetrics => {
   };
 };
 
-export const saveUserPersona = (persona: string) => localStorage.setItem('koda_persona', persona);
-export const getUserPersona = () => localStorage.getItem('koda_persona') || 'Coach Kai';
+export const saveUserPersona = async (persona: string) => {
+  try {
+    await AsyncStorage.setItem('koda_persona', persona);
+  } catch (e) {
+    console.error('Failed to save persona', e);
+  }
+};
+
+export const getUserPersona = async (): Promise<string> => {
+  try {
+    const value = await AsyncStorage.getItem('koda_persona');
+    return value || 'Coach Kai';
+  } catch (e) {
+    return 'Coach Kai';
+  }
+};

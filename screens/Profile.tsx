@@ -1,15 +1,23 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { Persona } from '../types';
 import { saveUserPersona, getUserPersona } from '../services/healthData';
 
 const Profile: React.FC = () => {
-  const [selectedPersona, setSelectedPersona] = useState(getUserPersona());
+  const [selectedPersona, setSelectedPersona] = useState<string>('Coach Kai');
 
-  const handlePersonaChange = (p: Persona) => {
+  useEffect(() => {
+    const load = async () => {
+      const p = await getUserPersona();
+      setSelectedPersona(p);
+    };
+    load();
+  }, []);
+
+  const handlePersonaChange = async (p: Persona) => {
     setSelectedPersona(p);
-    saveUserPersona(p);
+    await saveUserPersona(p);
   };
 
   const personas = [
@@ -22,8 +30,8 @@ const Profile: React.FC = () => {
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <View style={styles.header}>
         <View style={styles.avatarContainer}>
-          <Image 
-            source={{ uri: `https://picsum.photos/seed/${selectedPersona}/200` }} 
+          <Image
+            source={{ uri: `https://picsum.photos/seed/${selectedPersona}/200` }}
             style={styles.avatar}
           />
         </View>

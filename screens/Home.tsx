@@ -9,18 +9,28 @@ const Home: React.FC = () => {
   const [metrics, setMetrics] = useState<HealthMetrics | null>(null);
   const [briefing, setBriefing] = useState<DailyBriefing | null>(null);
   const [loading, setLoading] = useState(false);
-  const persona = getUserPersona();
+  const [persona, setPersona] = useState<string>('Coach Kai');
 
   useEffect(() => {
-    const data = getSimulatedHealthData();
-    setMetrics(data);
-    fetchBriefing(data);
+    const init = async () => {
+      // 1. Load Persona
+      const p = await getUserPersona();
+      setPersona(p);
+
+      // 2. Load Health Data
+      const data = getSimulatedHealthData();
+      setMetrics(data);
+
+      // 3. Fetch Briefing using the loaded persona
+      fetchBriefing(data, p);
+    };
+    init();
   }, []);
 
-  const fetchBriefing = async (data: HealthMetrics) => {
+  const fetchBriefing = async (data: HealthMetrics, activePersona: string) => {
     setLoading(true);
     try {
-      const b = await generateDailyBriefing(data, [], persona);
+      const b = await generateDailyBriefing(data, [], activePersona);
       setBriefing(b);
     } catch (error) {
       console.error(error);
@@ -38,8 +48,8 @@ const Home: React.FC = () => {
           <Text style={styles.title}>Koda</Text>
           <Text style={styles.subtitle}>Welcome back, Health Seeker</Text>
         </View>
-        <Image 
-          source={{ uri: `https://picsum.photos/seed/${persona}/100` }} 
+        <Image
+          source={{ uri: `https://picsum.photos/seed/${persona}/100` }}
           style={styles.avatar}
         />
       </View>
@@ -51,7 +61,7 @@ const Home: React.FC = () => {
           </View>
           <Text style={styles.personaText}>• from {persona}</Text>
         </View>
-        
+
         {loading ? (
           <ActivityIndicator color="white" style={styles.loader} />
         ) : briefing ? (
@@ -66,8 +76,8 @@ const Home: React.FC = () => {
             ))}
           </View>
         ) : (
-          <TouchableOpacity onPress={() => fetchBriefing(metrics)} style={styles.retryButton}>
-             <Text style={styles.retryText}>Refresh Briefing</Text>
+          <TouchableOpacity onPress={() => fetchBriefing(metrics, persona)} style={styles.retryButton}>
+            <Text style={styles.retryText}>Refresh Briefing</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -104,6 +114,7 @@ const styles = StyleSheet.create({
   avatar: { width: 48, height: 48, borderRadius: 24, borderWidth: 2, borderColor: '#10B981' },
   briefingCard: { backgroundColor: '#059669', borderRadius: 32, padding: 24, shadowColor: '#10B981', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.2, shadowRadius: 20 },
   briefingHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
+  briefingBody: {},
   tag: { backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
   tagText: { color: 'white', fontSize: 10, fontWeight: '800' },
   personaText: { color: '#D1FAE5', fontSize: 10 },

@@ -17,3 +17,45 @@ We are building a personal health assistant with following goals
 8. there should be a daily breifing in the morning for the user about the plan for the day.
 9. The health assistant should also have an ability to suggest healthier eating out options for the user based on their health metrics and meal information and location. if a user is an area, asks recomendation. health assistant should suggest not just the restaurant but also the specific dishes which are healthier for the user. 
 
+
+
+
+# Koda Health Assistant - Expo Setup
+
+Koda is now optimized for **Expo**, allowing you to run it as a native app on iOS/Android or on the Web.
+
+## Prerequisites
+- Node.js (v18+)
+- Expo Go app on your phone (for mobile testing)
+- **Google Gemini API Key** (Required for AI features)
+
+## Getting Started
+
+1. **Install Dependencies**
+   ```bash
+   npm install
+   ```
+
+2. **Configure API Key**
+   Create a `.env` file in the root directory:
+   ```
+   API_KEY=your_google_gemini_key_here
+   ```
+   *Get your key from [Google AI Studio](https://aistudio.google.com/)*
+
+3. **Run the App**
+   ```bash
+   # Start Expo development server
+   npx expo start
+   ```
+   *Note: If you change the .env file, restart the server with `npx expo start --clear`.*
+
+4. **Testing**
+   - **Android**: Press `a` or scan the QR code in Expo Go.
+   - **iOS**: Press `i` or scan the QR code in Expo Go.
+   - **Web**: Press `w` to open in your browser.
+
+## Native Features Used
+- **expo-image-picker**: For native camera and gallery access to log meals.
+- **expo-location**: For precise nearby search using GPS.
+- **react-native**: High-performance UI components.
