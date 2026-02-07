@@ -17,8 +17,9 @@ We are building a personal health assistant with following goals
 8. there should be a daily breifing in the morning for the user about the plan for the day.
 9. The health assistant should also have an ability to suggest healthier eating out options for the user based on their health metrics and meal information and location. if a user is an area, asks recomendation. health assistant should suggest not just the restaurant but also the specific dishes which are healthier for the user. 
 
+### Notes: we are building a prototey for now, and don't have a google play account to publish the app. so we will be using expo go to run the app on our devices. also we will have to simulate the health data from apple health and google fit, health conenct
 
- MVP Architecture & Components
+### MVP Architecture & Components
 
 ### Tech Stack Overview
 - **Platform**: Android (React Native)
