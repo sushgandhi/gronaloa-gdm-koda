@@ -24,7 +24,7 @@ The app follows a **Client-Server-Cloud** architecture:
 3.  **Backend (Google Cloud Run)**: A Node.js microservice using Browserbase to scrape Waitrose offers securely 
 4.  **Storage (Hybrid)**: 
     *   **Local**: Async Storage for offline caching.
-    *   **Cloud**: Firebase Firestore (Configured but currently mocked for dev speed).
+    *   **Cloud**: Firebase Firestore (Configured but can use mocked user for dev speed).
 
 ---
 
