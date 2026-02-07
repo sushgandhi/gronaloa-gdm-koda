@@ -8,7 +8,7 @@ Koda is a **AI-powered personal health assistant** built with **React Native (Ex
 1.  **Daily AI Briefing**: Generates a personalized morning plan based on sleep, activity, and local grocery deals (Waitrose).
 2.  **Smart Food Log**: Uses **Gemini Vision** to analyze meal photos for calories, macros, and healthy alternatives.
 3.  **Local Discovery**: Uses **Gemini Maps Grounding** to find and rank nearby healthy restaurants and stores.
-4.  **Waitrose Scraper Integration**: Connects to a custom **Cloud Run** microservice to fetch real-time food offers.
+4.  **Waitrose Integration**: Connects to a custom **Cloud Run** microservice to fetch real-time food offers using Browser-Use (https://gemini.browserbase.com/).
 5.  **Adaptive Personas**: Switch between Coach, Scientist, or Friend personas to change the AI's tone.
 
 ---
@@ -21,7 +21,7 @@ The app follows a **Client-Server-Cloud** architecture:
 2.  **AI Layer (Google Gemini)**: 
     *   `gemini-3-flash-preview`: For reasoning, daily briefings, and image analysis.
     *   `gemini-2.5-flash`: For Google Maps grounding (Location Search).
-3.  **Backend (Google Cloud Run)**: A Node.js microservice using Puppeteer/Browserbase to scrape Waitrose offers securely 
+3.  **Backend (Google Cloud Run)**: A Node.js microservice using Browserbase to scrape Waitrose offers securely 
 4.  **Storage (Hybrid)**: 
     *   **Local**: Async Storage for offline caching.
     *   **Cloud**: Firebase Firestore (Configured but currently mocked for dev speed).
