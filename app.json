@@ -1,3 +1,4 @@
+
 {
   "expo": {
     "name": "Koda Health Assistant",
@@ -36,9 +37,6 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "plugins": [
-      "expo-asset"
-    ]
+    }
   }
 }

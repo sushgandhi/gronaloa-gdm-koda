@@ -26,6 +26,7 @@ export const getUserPersona = async (): Promise<string> => {
     const value = await AsyncStorage.getItem('koda_persona');
     return value || 'Coach Kai';
   } catch (e) {
+    console.error('Failed to load persona', e);
     return 'Coach Kai';
   }
 };

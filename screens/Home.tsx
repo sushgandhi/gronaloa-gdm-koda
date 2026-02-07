@@ -48,8 +48,8 @@ const Home: React.FC = () => {
           <Text style={styles.title}>Koda</Text>
           <Text style={styles.subtitle}>Welcome back, Health Seeker</Text>
         </View>
-        <Image
-          source={{ uri: `https://picsum.photos/seed/${persona}/100` }}
+        <Image 
+          source={{ uri: `https://picsum.photos/seed/${persona}/100` }} 
           style={styles.avatar}
         />
       </View>
@@ -61,7 +61,7 @@ const Home: React.FC = () => {
           </View>
           <Text style={styles.personaText}>• from {persona}</Text>
         </View>
-
+        
         {loading ? (
           <ActivityIndicator color="white" style={styles.loader} />
         ) : briefing ? (
@@ -77,7 +77,7 @@ const Home: React.FC = () => {
           </View>
         ) : (
           <TouchableOpacity onPress={() => fetchBriefing(metrics, persona)} style={styles.retryButton}>
-            <Text style={styles.retryText}>Refresh Briefing</Text>
+             <Text style={styles.retryText}>Refresh Briefing</Text>
           </TouchableOpacity>
         )}
       </View>

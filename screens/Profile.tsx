@@ -30,8 +30,8 @@ const Profile: React.FC = () => {
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <View style={styles.header}>
         <View style={styles.avatarContainer}>
-          <Image
-            source={{ uri: `https://picsum.photos/seed/${selectedPersona}/200` }}
+          <Image 
+            source={{ uri: `https://picsum.photos/seed/${selectedPersona}/200` }} 
             style={styles.avatar}
           />
         </View>

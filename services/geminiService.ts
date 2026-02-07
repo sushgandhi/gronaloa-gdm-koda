@@ -67,20 +67,18 @@ export const generateDailyBriefing = async (
 };
 
 export const findNearbyHealthyOptions = async (lat: number, lng: number) => {
-  // Using Gemini 2.5 for Google Maps grounding support
+  // Explicitly using Gemini 3 Flash with Google Search
+  // Google Maps Grounding is restricted to 2.5 series, so we use Search for 3.0
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash-latest",
-    contents: "What are some healthy grocery stores and restaurants near my current location? Please provide specific healthy item or dish recommendations for each.",
+    model: "gemini-3-flash-preview",
+    contents: `Find the 3 best healthy grocery stores or restaurants near latitude ${lat}, longitude ${lng}. 
+    For each, provide:
+    1. Name
+    2. Why it's healthy
+    3. One recommended item
+    Keep the response concise and formatted as a list.`,
     config: {
-      tools: [{ googleMaps: {} }, { googleSearch: {} }],
-      toolConfig: {
-        retrievalConfig: {
-          latLng: {
-            latitude: lat,
-            longitude: lng
-          }
-        }
-      }
+      tools: [{ googleSearch: {} }]
     },
   });
 
