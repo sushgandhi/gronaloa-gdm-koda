@@ -1,0 +1,8 @@
+{
+  "name": "Koda Health Assistant",
+  "description": "A personal health assistant that integrates health metrics, meal photo analysis, and local discovery using Gemini AI.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ]
+}
